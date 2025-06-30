@@ -1,6 +1,7 @@
 import { User } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 interface Player {
   username: string;
@@ -10,26 +11,64 @@ interface Player {
   exploit_strategy: string[];
 }
 
+const tagMeta: Record<string, { emoji: string; color: string; description: string }> = {
+  LAG: {
+    emoji: "🔥",
+    color: "bg-red-600 hover:bg-red-700",
+    description: "Loose-Aggressive: Plays many hands with aggression.",
+  },
+  TAG: {
+    emoji: "⚔️",
+    color: "bg-blue-600 hover:bg-blue-700",
+    description: "Tight-Aggressive: Plays few hands but bets strongly.",
+  },
+  Fish: {
+    emoji: "🐟",
+    color: "bg-green-600 hover:bg-green-700",
+    description: "Weak or inexperienced player; easy to exploit.",
+  },
+  Nit: {
+    emoji: "🧊",
+    color: "bg-yellow-600 hover:bg-yellow-700",
+    description: "Extremely tight player; avoids risks.",
+  },
+  Maniac: {
+    emoji: "💥",
+    color: "bg-purple-600 hover:bg-purple-700",
+    description: "Overly aggressive; often bluffs or shoves.",
+  },
+  Tight: {
+    emoji: "🛡️",
+    color: "bg-indigo-600 hover:bg-indigo-700",
+    description: "Plays few hands, usually strong ones.",
+  },
+  Loose: {
+    emoji: "🎲",
+    color: "bg-orange-600 hover:bg-orange-700",
+    description: "Plays many hands, often speculative.",
+  },
+  Aggressive: {
+    emoji: "⚡",
+    color: "bg-red-500 hover:bg-red-600",
+    description: "Uses bets/raises frequently to apply pressure.",
+  },
+  Passive: {
+    emoji: "🪨",
+    color: "bg-gray-600 hover:bg-gray-700",
+    description: "Rarely raises or bluffs; calls too much.",
+  },
+  "Calling Station": {
+    emoji: "📞",
+    color: "bg-lime-600 hover:bg-lime-700",
+    description: "Rarely folds, frequently calls with weak hands.",
+  },
+};
+
 interface PlayerCardProps {
   player: Player;
 }
 
 const PlayerCard = ({ player }: PlayerCardProps) => {
-  const getTagColor = (tag: string) => {
-    const tagColors: { [key: string]: string } = {
-      'LAG': 'bg-red-600 hover:bg-red-700',
-      'TAG': 'bg-blue-600 hover:bg-blue-700',
-      'Fish': 'bg-green-600 hover:bg-green-700',
-      'Nit': 'bg-yellow-600 hover:bg-yellow-700',
-      'Maniac': 'bg-purple-600 hover:bg-purple-700',
-      'Tight': 'bg-indigo-600 hover:bg-indigo-700',
-      'Loose': 'bg-orange-600 hover:bg-orange-700',
-      'Aggressive': 'bg-red-500 hover:bg-red-600',
-      'Passive': 'bg-gray-600 hover:bg-gray-700',
-    };
-    return tagColors[tag] || 'bg-slate-600 hover:bg-slate-700';
-  };
-
   return (
     <Card className="bg-slate-800 border-slate-700 hover:border-green-400 transition-all duration-300 hover:shadow-lg hover:shadow-green-400/20 group">
       <CardHeader className="pb-3">
@@ -42,19 +81,32 @@ const PlayerCard = ({ player }: PlayerCardProps) => {
               {player.username}
             </h3>
             <div className="flex flex-wrap gap-1 mt-1">
-              {player.player_tags.map((tag, index) => (
-                <Badge 
-                  key={index} 
-                  className={`text-xs ${getTagColor(tag)} text-white border-0`}
-                >
-                  {tag}
-                </Badge>
-              ))}
+              {player.player_tags.map((tag, index) => {
+                const cleanTag = tag.trim();
+                const meta = tagMeta[cleanTag];
+
+                return (
+                  <HoverCard key={index}>
+                    <HoverCardTrigger asChild>
+                      <Badge
+                        className={`text-xs ${
+                          meta?.color ?? "bg-slate-600 hover:bg-slate-700"
+                        } text-white border-0 cursor-pointer`}
+                      >
+                        {meta?.emoji ?? "🏷️"} {cleanTag}
+                      </Badge>
+                    </HoverCardTrigger>
+                    <HoverCardContent className="text-xs max-w-xs bg-slate-800 border-slate-700 text-slate-200 shadow-lg">
+                      {meta?.description ?? "No description available."}
+                    </HoverCardContent>
+                  </HoverCard>
+                );
+              })}
             </div>
           </div>
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         {/* Profile Summary */}
         <div>

@@ -31,7 +31,7 @@ def generate_profile(raw_notes: str):
 
     try:
         response = openai.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": "You are a professional poker coach and analyst."},
                 {"role": "user", "content": prompt}

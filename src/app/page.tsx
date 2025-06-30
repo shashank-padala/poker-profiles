@@ -5,6 +5,7 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import PlayerCard from "@/components/PlayerCard";
 import { supabase } from "@/lib/supabaseClient";
+import { Loader } from "@/components/ui/loader"; // Make sure this exists or replace with custom spinner
 
 interface Player {
   username: string;
@@ -17,6 +18,7 @@ interface Player {
 export default function HomePage() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPlayers = async () => {
@@ -28,6 +30,8 @@ export default function HomePage() {
 
       if (error) console.error("Error fetching players:", error);
       else setPlayers(data as Player[]);
+
+      setLoading(false);
     };
 
     fetchPlayers();
@@ -46,7 +50,9 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bold text-green-400">Poker Profiles</h1>
-            <div className="text-sm text-slate-400">{filteredPlayers.length} players</div>
+            {!loading && (
+              <div className="text-sm text-slate-400">{filteredPlayers.length} players</div>
+            )}
           </div>
 
           {/* Search */}
@@ -63,9 +69,13 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Cards */}
+      {/* Main */}
       <main className="max-w-7xl mx-auto px-6 py-8">
-        {filteredPlayers.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <Loader />
+          </div>
+        ) : filteredPlayers.length === 0 ? (
           <div className="text-center py-12 text-slate-400">No players found</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
