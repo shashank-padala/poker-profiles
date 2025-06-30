@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Your existing config options here
+};
+
+export const config = {
+  matcher: ["/"], // apply middleware to homepage
 };
 
 export default nextConfig;
