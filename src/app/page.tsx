@@ -45,7 +45,7 @@ export default function HomePage() {
       <header className="bg-slate-800 border-b border-slate-700 px-6 py-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-green-400">PokerProfile</h1>
+            <h1 className="text-2xl font-bold text-green-400">Poker Profiles</h1>
             <div className="text-sm text-slate-400">{filteredPlayers.length} players</div>
           </div>
 
