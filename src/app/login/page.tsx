@@ -1,4 +1,3 @@
-// app/login/page.tsx
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
@@ -8,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { supabase } from '@/lib/supabaseClient'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 export default function AuthPage() {
   const router = useRouter()
@@ -16,9 +16,9 @@ export default function AuthPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [showVerifyDialog, setShowVerifyDialog] = useState(false)
   const emailRef = useRef<HTMLInputElement>(null)
 
-  // autofocus email on mode change
   useEffect(() => {
     emailRef.current?.focus()
   }, [mode])
@@ -31,14 +31,18 @@ export default function AuthPage() {
     let res
     if (mode === 'login') {
       res = await supabase.auth.signInWithPassword({ email, password })
+      if (res.error) {
+        setError(res.error.message)
+      } else {
+        router.push('/watchlist')
+      }
     } else {
       res = await supabase.auth.signUp({ email, password })
-    }
-
-    if (res.error) {
-      setError(res.error.message)
-    } else {
-      router.push('/watchlist')
+      if (res.error) {
+        setError(res.error.message)
+      } else {
+        setShowVerifyDialog(true)
+      }
     }
 
     setSubmitting(false)
@@ -50,7 +54,6 @@ export default function AuthPage() {
 
       <div className="flex-grow container mx-auto px-6 py-20">
         <div className="max-w-md mx-auto">
-          {/* Title */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2">
               {mode === 'login' ? 'Welcome Back' : 'Create Your Account'}
@@ -62,7 +65,6 @@ export default function AuthPage() {
             </p>
           </div>
 
-          {/* Form Card */}
           <div className="bg-gray-800 p-8 rounded-2xl shadow-lg">
             {error && (
               <div className="text-red-500 mb-4 text-center">{error}</div>
@@ -119,6 +121,22 @@ export default function AuthPage() {
           </div>
         </div>
       </div>
+
+      {/* Verify Email Dialog */}
+      {showVerifyDialog && (
+        <Dialog open={true} onOpenChange={() => setShowVerifyDialog(false)}>
+          <DialogContent className="bg-gray-800 text-white border border-gray-700">
+            <DialogHeader>
+              <DialogTitle className="text-lg">Verify Your Email</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm mt-2 text-gray-300">
+              A verification link has been sent to <strong>{email}</strong>.
+              <br />
+              Please check your inbox to confirm your account before logging in.
+            </p>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   )
 }
