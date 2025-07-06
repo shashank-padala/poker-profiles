@@ -1,90 +1,48 @@
-"use client";
-
-import { useEffect, useState, useMemo } from "react";
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import PlayerCard from "@/components/PlayerCard";
-import { supabase } from "@/lib/supabaseClient";
-import { Loader } from "@/components/ui/loader"; // Make sure this exists or replace with custom spinner
-
-interface Player {
-  username: string;
-  user_id: string;
-  player_tags: string[];
-  profile_summary: string[];
-  exploit_strategy: string[];
-}
+// app/page.tsx
+import Link from 'next/link';
+import Header from '../components/Header';
+import PlayerCardPreview from '../components/PlayerCardPreview';
+import Features from '../components/Features';
+import Footer from '../components/Footer';
 
 export default function HomePage() {
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchPlayers = async () => {
-      const { data, error } = await supabase
-        .from("poker_profiles")
-        .select("username, user_id, player_tags, profile_summary, exploit_strategy")
-        .not("profile_summary", "is", null)
-        .not("exploit_strategy", "is", null);
-
-      if (error) console.error("Error fetching players:", error);
-      else setPlayers(data as Player[]);
-
-      setLoading(false);
-    };
-
-    fetchPlayers();
-  }, []);
-
-  const filteredPlayers = useMemo(() => {
-    return players.filter(player =>
-      player.username.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [players, searchTerm]);
-
   return (
-    <div className="min-h-screen bg-slate-900 text-white">
-      {/* Header */}
-      <header className="bg-slate-800 border-b border-slate-700 px-6 py-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-green-400">Poker Profiles</h1>
-            {!loading && (
-              <div className="text-sm text-slate-400">{filteredPlayers.length} players</div>
-            )}
-          </div>
+    <div className="bg-gray-900 text-white min-h-screen flex flex-col">
+      <Header />
 
-          {/* Search */}
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-            <Input
-              type="text"
-              placeholder="Search players by username..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-green-400 focus:ring-green-400"
-            />
+      <main className="flex-grow">
+        {/* Hero */}
+        <div className="py-20">
+          <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row items-center gap-y-12 gap-x-16">
+            
+            <div className="lg:w-1/2 space-y-6">
+              <h1 className="text-4xl lg:text-5xl font-bold leading-tight">
+                The #1 Tool for <br />
+                <span className="text-green-400">Professional Poker Players</span>
+              </h1>
+              <p className="text-lg text-gray-300 max-w-lg">
+                Study opponents, analyze leaks, track performance, and stay ahead with AI-powered insights. Powered by community data and your game history.
+              </p>
+              
+              <Link href="/login">
+                <button className="mt-6 px-8 py-4 bg-green-500 text-black font-semibold rounded-lg hover:bg-green-600 transition">
+                  Get Started
+                </button>
+              </Link>
+            </div>
+
+            <div className="lg:w-1/2 flex justify-center">
+              <PlayerCardPreview />
+            </div>
           </div>
         </div>
-      </header>
 
-      {/* Main */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
-        {loading ? (
-          <div className="flex justify-center items-center py-20">
-            <Loader />
-          </div>
-        ) : filteredPlayers.length === 0 ? (
-          <div className="text-center py-12 text-slate-400">No players found</div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredPlayers.map((player) => (
-              <PlayerCard key={player.user_id} player={player} />
-            ))}
-          </div>
-        )}
+        {/* Features */}
+        <Features />
       </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
