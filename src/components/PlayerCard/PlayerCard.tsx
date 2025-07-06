@@ -259,18 +259,18 @@ export default function PlayerCard({
         <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
           {/* Preflop */}
           <div>
-            <h4 className="text-lg font-semibold text-white">♠️ Preflop</h4>
+            <h4 className="text-lg font-semibold text-green-400">♠️ Preflop</h4>
             <div className="grid grid-cols-3 gap-4 mt-2 text-sm text-gray-200">
               {chunk3(stats.preflop)[0].map((s) => (
                 <div key={s.label}>
-                  <strong>{s.label}:</strong> {s.value}
+                  <strong className="text-green-300">{s.label}:</strong> {s.value}
                 </div>
               ))}
             </div>
             <div className="grid grid-cols-3 gap-4 mt-1 text-sm text-gray-200">
               {chunk3(stats.preflop)[1].map((s) => (
                 <div key={s.label}>
-                  <strong>{s.label}:</strong> {s.value}
+                  <strong className="text-green-300">{s.label}:</strong> {s.value}
                 </div>
               ))}
             </div>
@@ -280,18 +280,18 @@ export default function PlayerCard({
 
           {/* Postflop */}
           <div>
-            <h4 className="text-lg font-semibold text-white">🧠 Postflop</h4>
+            <h4 className="text-lg font-semibold text-blue-400">🧠 Postflop</h4>
             <div className="grid grid-cols-3 gap-4 mt-2 text-sm text-gray-200">
               {chunk3(stats.postflop)[0].map((s) => (
                 <div key={s.label}>
-                  <strong>{s.label}:</strong> {s.value}
+                  <strong className="text-blue-300">{s.label}:</strong> {s.value}
                 </div>
               ))}
             </div>
             <div className="grid grid-cols-3 gap-4 mt-1 text-sm text-gray-200">
               {chunk3(stats.postflop)[1].map((s) => (
                 <div key={s.label}>
-                  <strong>{s.label}:</strong> {s.value}
+                  <strong className="text-blue-300">{s.label}:</strong> {s.value}
                 </div>
               ))}
             </div>
@@ -301,15 +301,15 @@ export default function PlayerCard({
 
           {/* Tournament */}
           <div>
-            <h4 className="text-lg font-semibold text-white">🏆 Tournament</h4>
-            <div className="mt-2 text-sm text-gray-200">
+            <h4 className="text-lg font-semibold text-yellow-300">🏆 Tournament</h4>
+            <div className="mt-2 text-sm text-gray-200 flex flex-wrap gap-x-6 gap-y-2">
               {stats.tournament.map((s) => (
-                <span key={s.label} className="mr-4">
-                  <strong>{s.label}:</strong>{' '}
+                <div key={s.label}>
+                  <strong className="text-yellow-200">{s.label}:</strong>{' '}
                   <span className={s.label === 'ROI' && +s.value > 0 ? 'text-green-400' : ''}>
                     {s.value}
                   </span>
-                </span>
+                </div>
               ))}
             </div>
           </div>
@@ -325,6 +325,7 @@ export default function PlayerCard({
           onCancel={handleCancelEdit}
         />
       </CardContent>
+
     </Card>
   )
 }
