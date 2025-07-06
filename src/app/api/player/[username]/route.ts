@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
   const { data: statsRow, error: sErr } = await (supabase ?? createUserClient('')).from('player_stats')
     .select(`
       vpip, pfr, three_bet, fold_to_three_bet, steal, check_raise,
-      cbet, fold_to_cbet, wtsd, wsd, aggression_factor, fold
+      cbet, fold_to_cbet, wtsd, wsd, fold, total_tournaments, avg_buyin, roi
     `)
     .eq('player_id', profile.id)
     .single()
@@ -72,15 +72,20 @@ export async function GET(req: NextRequest) {
     { label: '3Bet', value: `${statsRow.three_bet}%` },
     { label: 'Fold to 3Bet', value: `${statsRow.fold_to_three_bet}%` },
     { label: 'Steal', value: `${statsRow.steal}%` },
-    { label: 'Check-Raise', value: `${statsRow.check_raise}%` },
   ]
   const postflop = [
     { label: 'C-Bet', value: `${statsRow.cbet}%` },
     { label: 'Fold to C-Bet', value: `${statsRow.fold_to_cbet}%` },
+    { label: 'Check-Raise', value: `${statsRow.check_raise}%` },
+    { label: 'Fold', value: `${statsRow.fold}%` },
     { label: 'WTSD', value: `${statsRow.wtsd}%` },
     { label: 'W$SD', value: `${statsRow.wsd}%` },
-    { label: 'Aggression', value: `${statsRow.aggression_factor}` },
-    { label: 'Fold', value: `${statsRow.fold}%` },
+  ]
+
+  const tournament = [
+    { label: 'Total Tournaments', value: `${statsRow.total_tournaments}` },
+    { label: 'Avg Buy-In', value: `${statsRow.avg_buyin}` },
+    { label: 'ROI', value: `${statsRow.roi}` },
   ]
 
   return NextResponse.json({
@@ -88,7 +93,7 @@ export async function GET(req: NextRequest) {
       player_tags: profile.player_tags,
       exploit_strategy: profile.exploit_strategies,
       profile_summary: profile.player_summary,
-      stats: { preflop, postflop },
+      stats: { preflop, postflop, tournament },
     },
     userNote,
     isWatchlisted,
