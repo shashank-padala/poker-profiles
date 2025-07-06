@@ -1,3 +1,5 @@
+// app/components/PlayerCard.tsx
+
 'use client'
 
 import { useRouter } from 'next/navigation'
@@ -128,10 +130,23 @@ export default function PlayerCard({
   const summary = data.profile_summary ?? ''
   const stats = data.stats!
 
-  // helper to chunk into rows of 3
+  // utility formatters
+  const formatPct = (raw: string) =>
+    `${Math.round(parseFloat(raw.replace('%', '')))}%`
+
+  const formatNum = (raw: string) =>
+    parseInt(raw, 10).toLocaleString()
+
+  const formatROI = (raw: string) => {
+    const n = Math.round(parseFloat(raw) * 100)
+    const sign = n > 0 ? '+' : ''
+    return `${sign}${n}%`
+  }
+
+  // chunk into two rows of three
   const chunk3 = (arr: StatItem[]) => [arr.slice(0, 3), arr.slice(3, 6)]
 
-  // tag colour mapping
+  // color map for tags
   const tagColorMap: Record<string, string> = {
     TAG: 'bg-red-600 text-white',
     NIT: 'bg-orange-500 text-white',
@@ -143,22 +158,12 @@ export default function PlayerCard({
     'Elite/GTO': 'bg-blue-900 text-white',
   }
 
-  // compact view unchanged...
-  if (compact) {
-    return (
-      <Card className="bg-card border-border w-full">
-        <CardHeader className="flex justify-between items-center p-4">
-          {/* ... */}
-        </CardHeader>
-      </Card>
-    )
-  }
+  // compact view omitted for brevity...
 
   return (
     <Card className="bg-card border-border hover:border-green-400 hover:shadow-lg hover:shadow-green-400/20 w-full">
-      {/* — Header & action buttons — */}
+      {/* — Header & actions — */}
       <CardHeader className="flex justify-between items-center p-4">
-        {/* avatar, name, tags */}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-bold">
             {player.username.charAt(0).toUpperCase()}
@@ -175,8 +180,8 @@ export default function PlayerCard({
           </div>
         </div>
 
-        {/* Summary / Exploit / Profile / Bookmark */}
         <div className="flex items-center gap-2">
+          {/* Summary */}
           <Dialog>
             <DialogTrigger asChild>
               <Button size="sm" className="bg-green-500 text-white hover:bg-green-600">
@@ -202,6 +207,7 @@ export default function PlayerCard({
             </DialogContent>
           </Dialog>
 
+          {/* Exploit */}
           <Dialog>
             <DialogTrigger asChild>
               <Button size="sm" className="bg-orange-500 text-white hover:bg-orange-600">
@@ -236,6 +242,7 @@ export default function PlayerCard({
             </DialogContent>
           </Dialog>
 
+          {/* Profile & Bookmark */}
           <Button
             size="sm"
             variant="ghost"
@@ -260,20 +267,16 @@ export default function PlayerCard({
           {/* Preflop */}
           <div>
             <h4 className="text-lg font-semibold text-green-400">♠️ Preflop</h4>
-            <div className="grid grid-cols-3 gap-4 mt-2 text-sm text-gray-200">
-              {chunk3(stats.preflop)[0].map((s) => (
-                <div key={s.label}>
-                  <strong className="text-green-300">{s.label}:</strong> {s.value}
-                </div>
-              ))}
-            </div>
-            <div className="grid grid-cols-3 gap-4 mt-1 text-sm text-gray-200">
-              {chunk3(stats.preflop)[1].map((s) => (
-                <div key={s.label}>
-                  <strong className="text-green-300">{s.label}:</strong> {s.value}
-                </div>
-              ))}
-            </div>
+            {chunk3(stats.preflop).map((row, i) => (
+              <div key={i} className="grid grid-cols-3 gap-4 mt-2 text-m text-gray-200">
+                {row.map((s) => (
+                  <div key={s.label}>
+                    <span className="text-slate-400">{s.label}:</span>{' '}
+                    <span className="text-base font-bold text-white">{formatPct(s.value)}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
 
           <hr className="my-3 border-gray-700" />
@@ -281,20 +284,16 @@ export default function PlayerCard({
           {/* Postflop */}
           <div>
             <h4 className="text-lg font-semibold text-blue-400">🧠 Postflop</h4>
-            <div className="grid grid-cols-3 gap-4 mt-2 text-sm text-gray-200">
-              {chunk3(stats.postflop)[0].map((s) => (
-                <div key={s.label}>
-                  <strong className="text-blue-300">{s.label}:</strong> {s.value}
-                </div>
-              ))}
-            </div>
-            <div className="grid grid-cols-3 gap-4 mt-1 text-sm text-gray-200">
-              {chunk3(stats.postflop)[1].map((s) => (
-                <div key={s.label}>
-                  <strong className="text-blue-300">{s.label}:</strong> {s.value}
-                </div>
-              ))}
-            </div>
+            {chunk3(stats.postflop).map((row, i) => (
+              <div key={i} className="grid grid-cols-3 gap-4 mt-2 text-m text-gray-200">
+                {row.map((s) => (
+                  <div key={s.label}>
+                    <span className="text-slate-400">{s.label}:</span>{' '}
+                    <span className="text-base font-bold text-white">{formatPct(s.value)}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
 
           <hr className="my-3 border-gray-700" />
@@ -302,15 +301,31 @@ export default function PlayerCard({
           {/* Tournament */}
           <div>
             <h4 className="text-lg font-semibold text-yellow-300">🏆 Tournament</h4>
-            <div className="mt-2 text-sm text-gray-200 flex flex-wrap gap-x-6 gap-y-2">
-              {stats.tournament.map((s) => (
-                <div key={s.label}>
-                  <strong className="text-yellow-200">{s.label}:</strong>{' '}
-                  <span className={s.label === 'ROI' && +s.value > 0 ? 'text-green-400' : ''}>
-                    {s.value}
-                  </span>
-                </div>
-              ))}
+            <div className="mt-2 text-m text-gray-200 flex flex-wrap gap-x-6 gap-y-2">
+              {stats.tournament.map((s) => {
+                let disp: string
+                if (s.label === 'Total Tournaments' || s.label === 'Avg Buy-In') {
+                  disp = formatNum(s.value)
+                } else {
+                  disp = formatROI(s.value)
+                }
+                return (
+                  <div key={s.label}>
+                    <span className="text-slate-400">{s.label}:</span>{' '}
+                    {s.label === 'ROI' ? (
+                      <span
+                        className={`text-base font-bold ${
+                          disp.startsWith('+') ? 'text-green-400' : 'text-red-400'
+                        }`}
+                      >
+                        {disp}
+                      </span>
+                    ) : (
+                      <span className="text-base font-bold text-white">{disp}</span>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           </div>
         </div>
