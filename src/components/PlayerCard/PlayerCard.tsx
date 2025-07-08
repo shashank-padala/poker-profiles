@@ -266,13 +266,7 @@ export default function PlayerCard({
           >
             <Eye />
           </Button>
-          <Button size="sm" variant="ghost" onClick={toggleWatch} title={isWatchlisted ? 'Unbookmark' : 'Bookmark'}>
-            <Bookmark
-              className={`transition ${
-                isWatchlisted ? 'fill-yellow-500 text-yellow-500' : 'text-muted-foreground'
-              }`}
-            />
-          </Button>
+
           {onRemove && (
             <Button size="sm" variant="ghost" onClick={onRemove} title="Remove from watchlist">
               <Trash2 className="text-red-400 hover:text-red-300" />
