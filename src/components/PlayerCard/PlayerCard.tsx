@@ -4,7 +4,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState, useEffect, ChangeEvent } from 'react'
-import { Bookmark, Eye } from 'lucide-react'
+import { Bookmark, Eye, Trash2 } from 'lucide-react'
 import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -45,10 +45,12 @@ export default function PlayerCard({
   player,
   accessToken,
   compact = false,
+  onRemove,
 }: {
   player: Player
   accessToken?: string
   compact?: boolean
+  onRemove?: () => void
 }) {
   const router = useRouter()
   const [data, setData] = useState<ProfileData | null>(null)
@@ -78,13 +80,24 @@ export default function PlayerCard({
   const toggleWatch = async (e: React.MouseEvent) => {
     e.stopPropagation()
     const method = isWatchlisted ? 'DELETE' : 'POST'
+
+    // update backend
     await fetch('/api/watchlist', {
       method,
       headers,
       body: JSON.stringify({ username: player.username }),
     })
+
+    // flip local state
     setIsWatchlisted(!isWatchlisted)
-    router.refresh()
+
+    if (method === 'DELETE') {
+      // when removing, tell parent to drop this card
+      onRemove?.()
+    } else {
+      // when adding, you can still refresh or let parent handle it
+      router.refresh()
+    }
   }
 
   const handleSaveNote = async (e?: React.MouseEvent) => {
@@ -157,6 +170,8 @@ export default function PlayerCard({
     'Volatile Fish': 'bg-pink-400 text-white',
     'Elite/GTO': 'bg-blue-900 text-white',
   }
+
+  
 
   // compact view omitted for brevity...
 
@@ -258,6 +273,11 @@ export default function PlayerCard({
               }`}
             />
           </Button>
+          {onRemove && (
+            <Button size="sm" variant="ghost" onClick={onRemove} title="Remove from watchlist">
+              <Trash2 className="text-red-400 hover:text-red-300" />
+            </Button>
+          )}
         </div>
       </CardHeader>
 
